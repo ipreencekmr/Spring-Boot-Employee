@@ -22,6 +22,15 @@ public class EmployeeService {
     @Autowired
     private EmployeeDAO employeeDAO;
 
+    @Autowired
+    private DepartmentService departmentService;
+
+    @Autowired
+    private QualificationService qualificationService;
+
+    @Autowired
+    private AddressService addressService;
+
     public List<Employee> getEmployees() {
         Iterable<Employee> employeeIterable = employeeDAO.findAll();
         List<Employee> employeeList = new ArrayList<Employee>();
@@ -38,15 +47,30 @@ public class EmployeeService {
                                    Qualification qualification,
                                    int age) {
 
+        Department foundDept = department != null && department.getId() != null ? departmentService.getDepartment(department.getId()) : null;
+        if(department != null && foundDept == null) {
+            foundDept = departmentService.createDepartment(department.getValue());
+        }
+
+        Qualification foundQlf = qualification != null && qualification.getId() != null ? qualificationService.getQualificationInfo(qualification.getId()) : null;
+        if (qualification != null && foundQlf == null) {
+            foundQlf = qualificationService.createQualification(qualification.getValue());
+        }
+
+        Address foundAddr = address != null && address.getId() != null ? addressService.getAddressById(address.getId()) : null;
+        if (address != null && foundAddr == null ){
+            foundAddr = addressService.createAddress(address);
+        }
+
         Employee employee = new Employee();
         employee.setFirstName(firstName);
         employee.setLastName(lastName);
         employee.setGender(gender);
         employee.setEmailId(emailId);
-        employee.setDepartment(department);
+        employee.setDepartment(foundDept);
         employee.setAge(age);
-        employee.setAddress(address);
-        employee.setQualification(qualification);
+        employee.setAddress(foundAddr);
+        employee.setQualification(foundQlf);
         employee.setStatus(EmpStatus.ACTIVE);
         employeeDAO.save(employee);
     }
@@ -68,6 +92,32 @@ public class EmployeeService {
         newEmp.setFirstName(employee.getFirstName());
         newEmp.setLastName(employee.getLastName());
         newEmp.setEmailId(employee.getEmailId());
+        newEmp.setAge(employee.getAge());
+        newEmp.setGender(employee.getGender());
+
+        Department department = employee.getDepartment();
+        Qualification qualification = employee.getQualification();
+        Address address = employee.getAddress();
+
+        Department foundDept = department != null && department.getId() != null ? departmentService.getDepartment(department.getId()) : null;
+        if(department != null && foundDept == null) {
+            foundDept = departmentService.createDepartment(department.getValue());
+        }
+
+        Qualification foundQlf = qualification != null && qualification.getId() != null ? qualificationService.getQualificationInfo(qualification.getId()) : null;
+        if (qualification != null && foundQlf == null) {
+            foundQlf = qualificationService.createQualification(qualification.getValue());
+        }
+
+        Address foundAddr = address != null && address.getId() != null ? addressService.getAddressById(address.getId()) : null;
+        if (address != null && foundAddr == null ){
+            foundAddr = addressService.createAddress(address);
+        }
+
+        newEmp.setQualification(foundQlf);
+        newEmp.setDepartment(foundDept);
+        newEmp.setAddress(foundAddr);
+
         return employeeDAO.save(newEmp);
     }
 
