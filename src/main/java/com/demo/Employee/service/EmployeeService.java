@@ -131,4 +131,13 @@ public class EmployeeService {
         updatedEmp.setStatus(status);
         return employeeDAO.save(updatedEmp);
     }
+
+    public Boolean deleteAnEmployee(Integer employeeId) {
+        Optional<Employee> optEmp = employeeDAO.findById(employeeId);
+        if (!optEmp.isPresent()) {
+            return false;
+        }
+        employeeDAO.deleteById(employeeId);
+        return true;
+    }
 }
