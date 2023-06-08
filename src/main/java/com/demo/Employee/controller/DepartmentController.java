@@ -20,10 +20,6 @@ public class DepartmentController {
 
        Department createdDepartment = departmentService.createDepartment(department.getValue());
 
-       if (createdDepartment == null) {
-           return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-       }
-
         return new ResponseEntity(
                 createdDepartment, HttpStatus.CREATED
         );
