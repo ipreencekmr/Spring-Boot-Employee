@@ -34,6 +34,9 @@ public class Address {
     private String city;
 
     @Column
+    private String state;
+
+    @Column
     private String country;
 
 }

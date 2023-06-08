@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EmployeeDAO extends JpaRepository<Employee, Integer> {
 
+    public Employee findByEmailId(String emailAddress);
 }
