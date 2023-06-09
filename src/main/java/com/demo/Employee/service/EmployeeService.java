@@ -38,7 +38,7 @@ public class EmployeeService {
         return employeeList;
     }
 
-    public void createEmployee(String firstName,
+    public Employee createEmployee(String firstName,
                                    String lastName,
                                    Gender gender,
                                    String emailId,
@@ -72,7 +72,7 @@ public class EmployeeService {
         employee.setAddress(foundAddr);
         employee.setQualification(foundQlf);
         employee.setStatus(EmpStatus.ACTIVE);
-        employeeDAO.save(employee);
+        return employeeDAO.save(employee);
     }
 
     public Employee getEmployeeInfo(Integer employeeId) {
