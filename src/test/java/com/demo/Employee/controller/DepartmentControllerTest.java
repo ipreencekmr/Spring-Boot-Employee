@@ -163,4 +163,28 @@ public class DepartmentControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    @DisplayName("test delete a department")
+    void testDeleteADepartment() throws Exception {
+        //mock update existing department
+        Department department = new Department();
+        department.setId(1);
+        when(departmentDAO.findById(1)).thenReturn(Optional.of(department));
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/departments/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(true)));
+    }
+
+    @Test
+    @DisplayName("test delete non existing department")
+    void testDeleteNonExistingDepartment() throws Exception {
+        //mock update non existing department
+        when(departmentDAO.findById(0)).thenReturn(Optional.empty());
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/departments/0"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$", is(false)));
+    }
+
 }

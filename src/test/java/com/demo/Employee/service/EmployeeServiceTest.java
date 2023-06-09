@@ -283,6 +283,10 @@ public class EmployeeServiceTest {
     void testCreateAnEmployeeWithNullObjects() {
 
         //mock employee save
+        employee.setDepartment(null);
+        employee.setQualification(null);
+        employee.setAddress(null);
+
         when(employeeDAO.save(any(Employee.class))).thenReturn(employee);
 
         Employee createdEmp = employeeService.createEmployee(employee.getFirstName(),
