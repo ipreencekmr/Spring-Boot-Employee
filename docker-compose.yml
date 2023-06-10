@@ -3,7 +3,7 @@ services:
   spring-boot-app:
     container_name: spring-app
     image: ipreencekmr/employee
-    restart: on-failure
+    restart: always
     depends_on:
       - mysqldb
     build: .
