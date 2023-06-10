@@ -7,6 +7,7 @@ import com.demo.Employee.model.Department;
 import com.demo.Employee.model.Employee;
 import com.demo.Employee.model.Qualification;
 import com.demo.Employee.repository.EmployeeDAO;
+import com.demo.Employee.service.EmployeeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -25,6 +27,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.Optional;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @TestPropertySource("/application-test.properties")
@@ -317,10 +321,48 @@ public class EmployeeControllerTest {
                 .andExpect(content().string("false"));
     }
 
+    @Test
+    @DisplayName("Test inactivate and employee")
+    public void testInactivateAnEmployee() throws Exception {
+
+        employee = new Employee();
+        employee.setFirstName("MockFirstName");
+        employee.setLastName("MockLastName");
+        employee.setEmailId("mockEmail@mockdomain.com");
+        employee.setAge(25);
+        employee.setGender(Gender.MALE);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/employees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(employee)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$").doesNotExist());
+
+        Optional<Employee> emp = Optional.ofNullable(employeeDAO.findByEmailId("mockEmail@mockdomain.com"));
+        assertTrue(emp.isPresent());
+
+        Employee createdEmployee = emp.get();
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/employees/"+createdEmployee.getId()+"/inactivate")
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .content("{}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status",is(EmpStatus.DISCONTINUED.toString())));
+    }
+
+    @Test
+    @DisplayName("Test inactivate a non existing employee")
+    public void testInactivateANonExistingEmployee() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/employees/0/inactivate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isNotFound());
+    }
+
     @AfterEach
     void afterEach() {
         jdbcTemplate.execute(sqlDeleteEmployee);
     }
-
 
 }
