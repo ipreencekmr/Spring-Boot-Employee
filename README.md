@@ -6,6 +6,10 @@
 
 ## Run
 
+### Description
+
+Need to run MySQL Server Explicitly and Change Properties
+
 `mvn spring-boot:run`
 
 ## Test 
@@ -24,7 +28,11 @@
 
 ## Docker Run
 
-`docker build -t demo:latest`
+### Description
 
-`docker run -p 8080:8080 demo:latest`
+Runs the application along with MySQL Server
+
+`docker-compose up --detach`
+
+`docker-compose down`
 
