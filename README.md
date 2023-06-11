@@ -36,3 +36,17 @@ Runs the application along with MySQL Server
 
 `docker-compose down`
 
+## Tech Stack Used
+
+- Maven
+- Docker
+- JUnit (Unit Testing)
+- Jacoco (Code Coverage)
+- Mockito (Mock Database)
+- Surefire (Test Reports)
+- MySQL
+- AWS EC2 (Database Deployment)
+- AWS ECS (Application Deployment)
+- Github Actions (CICD)
+
+
