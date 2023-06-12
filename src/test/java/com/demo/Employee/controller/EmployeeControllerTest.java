@@ -7,12 +7,10 @@ import com.demo.Employee.model.Department;
 import com.demo.Employee.model.Employee;
 import com.demo.Employee.model.Qualification;
 import com.demo.Employee.repository.EmployeeDAO;
-import com.demo.Employee.service.EmployeeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -20,13 +18,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -37,11 +36,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class EmployeeControllerTest {
 
-    private static MockHttpServletRequest request;
-
-    @PersistenceContext
-    private EntityManager entityManager;
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -51,131 +45,189 @@ public class EmployeeControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private Employee employee;
-
-    @Autowired
+    @MockBean
     private EmployeeDAO employeeDAO;
+
+    private Address address;
+
+    private Department department;
+
+    private Qualification qualification;
 
     public static final MediaType APPLICATION_JSON_UTF8 = MediaType.APPLICATION_JSON;
 
-    @Value("${sql.script.create.employee}")
-    private String sqlAddEmployee;
+    @Value("${mock.employee.first.name}")
+    private String firstName;
 
-    @Value("${sql.script.delete.employee}")
-    private String sqlDeleteEmployee;
+    @Value("${mock.employee.last.name}")
+    private String lastName;
 
-    @BeforeAll
-    public static void beforeAll() {
-        request = new MockHttpServletRequest();
-        request.setParameter("firstName","MockFirstName");
-        request.setParameter("lastName","MockLastName");
-        request.setParameter("emailId", "MockEmail@mockdomain.com");
-        request.setParameter("age", String.valueOf(35));
-        request.setParameter("gender","MALE");
-    }
+    @Value("${mock.employee.age}")
+    private Integer age;
+
+    @Value("${mock.employee.email}")
+    private String emailId;
+
+    @Value("${mock.employee.updated.first.name}")
+    private String updatedFirstName;
+
+    @Value("${mock.employee.updated.last.name}")
+    private String updatedLastName;
+
+    @Value("${mock.employee.updated.age}")
+    private Integer updatedAge;
+
+    @Value("${mock.employee.updated.email}")
+    private String updatedEmailId;
+
+    @Value("${mock.address.line1}")
+    private String line1;
+
+    @Value("${mock.address.line2}")
+    private String line2;
+
+    @Value("${mock.address.zip.code}")
+    private Integer zipCode;
+
+    @Value("${mock.address.city}")
+    private String city;
+
+    @Value("${mock.address.suite}")
+    private String aptSuite;
+
+    @Value("${mock.address.society}")
+    private String society;
+
+    @Value("${mock.address.country}")
+    private String country;
+
+    @Value("${mock.address.updated.zip.code}")
+    private Integer updatedZipCode;
+
+    @Value("${mock.address.updated.city}")
+    private String updatedCity;
+
+    @Value("${mock.address.updated.suite}")
+    private String updatedAptSuite;
+
+    @Value("${mock.department.name}")
+    private String departmentName;
+
+    @Value("${mock.qualification.name}")
+    private String qualificationName;
 
     @BeforeEach
     void beforeEach() {
-        jdbcTemplate.execute(sqlAddEmployee);
+        address = new Address();
+        address.setZipCode(zipCode);
+        address.setAptSuite(aptSuite);
+        address.setAddressLine1(line1);
+        address.setAddressLine2(line2);
+        address.setSociety(society);
+        address.setCity(city);
+        address.setCountry(country);
+
+        department = new Department();
+        department.setValue(departmentName);
+
+        qualification = new Qualification();
+        qualification.setValue(qualificationName);
+
+    }
+
+    @AfterEach
+    void afterEach() {
+        address = null;
+        department = null;
+        qualification = null;
+        Mockito.reset(employeeDAO);
     }
 
     @Test
     @DisplayName("Test Get All Employees")
     public void testGetEmployeesRequest() throws Exception {
 
-        employee = new Employee();
-        employee.setFirstName("MockFirstName");
-        employee.setLastName("MockLastName");
-        employee.setEmailId("mockEmail@mockdomain.com");
-        employee.setAge(25);
+        Employee employee = new Employee();
+        employee.setFirstName(firstName);
+        employee.setLastName(lastName);
+        employee.setEmailId(emailId);
+        employee.setAge(age);
         employee.setGender(Gender.MALE);
 
-        entityManager.persist(employee);
-        entityManager.flush();
+        List<Employee> employeeList = new ArrayList<>();
+        employeeList.add(employee);
+
+        when(employeeDAO.findAll()).thenReturn(employeeList);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/employees"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$").isArray());
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", hasSize(1)));
     }
 
     @Test
     @DisplayName("Test Create An Employee")
     public void testCreateAnEmployee() throws Exception {
-        employee = new Employee();
-        employee.setFirstName("MockFirstName");
-        employee.setLastName("MockLastName");
-        employee.setEmailId("mockEmail@mockdomain.com");
-        employee.setAge(25);
+        Employee employee = new Employee();
+        employee.setFirstName(firstName);
+        employee.setLastName(lastName);
+        employee.setEmailId(emailId);
+        employee.setAge(age);
         employee.setGender(Gender.MALE);
+
+        when(employeeDAO.save(any(Employee.class))).thenReturn(employee);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/employees")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employee)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$").doesNotExist());
-
-        Optional<Employee> emp = Optional.ofNullable(employeeDAO.findByEmailId("mockEmail@mockdomain.com"));
-        assertTrue(emp.isPresent());
-
-        Employee createdEmployee = emp.get();
-        assertNotNull(createdEmployee);
-        assertEquals(createdEmployee.getFirstName(), "MockFirstName");
-        assertEquals(createdEmployee.getLastName(), "MockLastName");
-        assertEquals(createdEmployee.getEmailId(), "mockEmail@mockdomain.com");
-        assertEquals(createdEmployee.getAge(), 25);
-        assertEquals(createdEmployee.getGender(), Gender.MALE);
-        assertEquals(createdEmployee.getStatus(), EmpStatus.ACTIVE);
     }
 
     @Test
     @DisplayName("Test Update An Employee")
     public void testUpdateAnEmployee() throws Exception {
-        employee = new Employee();
-        employee.setFirstName("MockFirstName");
-        employee.setLastName("MockLastName");
-        employee.setEmailId("mockEmail@mockdomain.com");
-        employee.setAge(25);
+        Employee employee = new Employee();
+        employee.setFirstName(firstName);
+        employee.setLastName(lastName);
+        employee.setEmailId(emailId);
+        employee.setAge(age);
         employee.setGender(Gender.MALE);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/employees")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(employee)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$").doesNotExist());
+        when(employeeDAO.findById(1)).thenReturn(Optional.of(employee));
 
-        Optional<Employee> emp = Optional.ofNullable(employeeDAO.findByEmailId("mockEmail@mockdomain.com"));
-        assertTrue(emp.isPresent());
+        Employee updateEmp = new Employee();
+        updateEmp.setFirstName(updatedFirstName);
+        updateEmp.setLastName(updatedLastName);
+        updateEmp.setEmailId(updatedEmailId);
+        updateEmp.setAge(updatedAge);
+        updateEmp.setGender(Gender.FEMALE);
 
-        Employee createdEmployee = emp.get();
+        when(employeeDAO.save(any(Employee.class))).thenReturn(updateEmp);
 
-        //Update Information
-        createdEmployee.setFirstName("modified first name");
-        createdEmployee.setLastName("modified last name");
-        createdEmployee.setEmailId("modifiedemail@mockdomain.com");
-        createdEmployee.setAge(30);
-        createdEmployee.setGender(Gender.FEMALE);
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/employees/"+createdEmployee.getId())
+        mockMvc.perform(MockMvcRequestBuilders.put("/employees/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createdEmployee)))
+                .content(objectMapper.writeValueAsString(employee)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.firstName", is("modified first name")))
-                .andExpect(jsonPath("$.lastName", is("modified last name")))
-                .andExpect(jsonPath("$.emailId", is("modifiedemail@mockdomain.com")))
-                .andExpect(jsonPath("$.age", is(30)))
+                .andExpect(jsonPath("$.firstName", is(updateEmp.getFirstName())))
+                .andExpect(jsonPath("$.lastName", is(updateEmp.getLastName())))
+                .andExpect(jsonPath("$.emailId", is(updateEmp.getEmailId())))
+                .andExpect(jsonPath("$.age", is(updateEmp.getAge())))
                 .andExpect(jsonPath("$.gender", is(Gender.FEMALE.toString())));
     }
 
     @Test
     @DisplayName("Test Update A non existing Employee")
     public void testUpdateANonExistingEmployee() throws Exception {
-        employee = new Employee();
-        employee.setFirstName("MockFirstName");
-        employee.setLastName("MockLastName");
-        employee.setEmailId("mockEmail@mockdomain.com");
-        employee.setAge(25);
+        Employee employee = new Employee();
+        employee.setFirstName(firstName);
+        employee.setLastName(lastName);
+        employee.setEmailId(emailId);
+        employee.setAge(age);
         employee.setGender(Gender.MALE);
+
+        when(employeeDAO.findById(0)).thenReturn(Optional.empty());
 
         mockMvc.perform(MockMvcRequestBuilders.put("/employees/0")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -188,41 +240,21 @@ public class EmployeeControllerTest {
     @DisplayName("Test Create An Employee with Address")
     public void testCreateAnEmployeeWithAddress() throws Exception {
 
-        Address address = new Address();
-        address.setAddressLine1("mock line 1");
-        address.setAddressLine2("mock line 2");
-        address.setAptSuite("mock apt suite");
-        address.setSociety("mock society");
-        address.setCity("mock city");
-        address.setState("mock state");
-        address.setCountry("mock country");
-        address.setZipCode(1001);
-
-        employee = new Employee();
-        employee.setFirstName("MockFirstName");
-        employee.setLastName("MockLastName");
-        employee.setEmailId("mockEmail@mockdomain.com");
-        employee.setAge(25);
+        Employee employee = new Employee();
+        employee.setFirstName(firstName);
+        employee.setLastName(lastName);
+        employee.setEmailId(emailId);
+        employee.setAge(age);
         employee.setGender(Gender.MALE);
         employee.setAddress(address);
+
+        when(employeeDAO.save(any(Employee.class))).thenReturn(employee);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/employees")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(employee)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$").doesNotExist());
-
-        Optional<Employee> emp = Optional.ofNullable(employeeDAO.findByEmailId("mockEmail@mockdomain.com"));
-        assertTrue(emp.isPresent());
-
-        Employee createdEmployee = emp.get();
-
-        assertNotNull(createdEmployee);
-        assertNotNull(createdEmployee.getAddress());
-        assertEquals(createdEmployee.getAddress().getCity(), "mock city");
-        assertEquals(createdEmployee.getAddress().getZipCode(), 1001);
-        assertEquals(createdEmployee.getAddress().getAptSuite(), "mock apt suite");
-        assertEquals(createdEmployee.getAddress().getAddressLine2(), "mock line 2");
     }
 
 
@@ -233,11 +265,11 @@ public class EmployeeControllerTest {
         Department department = new Department();
         department.setValue("mock department");
 
-        employee = new Employee();
-        employee.setFirstName("MockFirstName");
-        employee.setLastName("MockLastName");
-        employee.setEmailId("mockEmail@mockdomain.com");
-        employee.setAge(25);
+        Employee employee = new Employee();
+        employee.setFirstName(firstName);
+        employee.setLastName(lastName);
+        employee.setEmailId(emailId);
+        employee.setAge(age);
         employee.setGender(Gender.MALE);
         employee.setDepartment(department);
 
@@ -246,30 +278,17 @@ public class EmployeeControllerTest {
                         .content(objectMapper.writeValueAsString(employee)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$").doesNotExist());
-
-        Optional<Employee> emp = Optional.ofNullable(employeeDAO.findByEmailId("mockEmail@mockdomain.com"));
-        assertTrue(emp.isPresent());
-
-        Employee createdEmployee = emp.get();
-
-        assertNotNull(createdEmployee);
-        assertNotNull(createdEmployee.getDepartment());
-        assertNotNull(createdEmployee.getDepartment().getId());
-        assertEquals(createdEmployee.getDepartment().getValue(), "mock department");
     }
 
     @Test
     @DisplayName("Test Create An Employee with Qualification")
     public void testCreateAnEmployeeWithQualification() throws Exception {
 
-        Qualification qualification = new Qualification();
-        qualification.setValue("mock qualification");
-
-        employee = new Employee();
-        employee.setFirstName("MockFirstName");
-        employee.setLastName("MockLastName");
-        employee.setEmailId("mockEmail@mockdomain.com");
-        employee.setAge(25);
+        Employee employee = new Employee();
+        employee.setFirstName(firstName);
+        employee.setLastName(lastName);
+        employee.setEmailId(emailId);
+        employee.setAge(age);
         employee.setGender(Gender.MALE);
         employee.setQualification(qualification);
 
@@ -278,72 +297,57 @@ public class EmployeeControllerTest {
                         .content(objectMapper.writeValueAsString(employee)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$").doesNotExist());
-
-        Optional<Employee> emp = Optional.ofNullable(employeeDAO.findByEmailId("mockEmail@mockdomain.com"));
-        assertTrue(emp.isPresent());
-
-        Employee createdEmployee = emp.get();
-
-        assertNotNull(createdEmployee);
-        assertNotNull(createdEmployee.getQualification());
-        assertNotNull(createdEmployee.getQualification().getId());
-        assertEquals(createdEmployee.getQualification().getValue(), "mock qualification");
     }
 
     @Test
     @DisplayName("Test Delete a non existing Employee")
     public void testDeleteANonExistingEmployee() throws Exception {
 
-        employee = new Employee();
-        employee.setFirstName("MockFirstName");
-        employee.setLastName("MockLastName");
-        employee.setEmailId("mockEmail@mockdomain.com");
-        employee.setAge(25);
-        employee.setGender(Gender.MALE);
+        when(employeeDAO.findById(0)).thenReturn(Optional.empty());
 
-        entityManager.persist(employee);
-        entityManager.flush();
-
-        Optional<Employee> emp = Optional.ofNullable(employeeDAO.findByEmailId("mockEmail@mockdomain.com"));
-        assertTrue(emp.isPresent());
-
-        mockMvc.perform(MockMvcRequestBuilders.delete("/employees/"+emp.get().getId()))
-                .andExpect(status().isOk())
-                .andExpect(content().string("true"));
+        mockMvc.perform(MockMvcRequestBuilders.delete("/employees/0"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("false"));
     }
 
     @Test
     @DisplayName("Test Delete an existing Employee")
     public void testDeleteAnExistingEmployee() throws Exception {
 
+        Employee employee = new Employee();
+        employee.setFirstName(firstName);
+        employee.setLastName(lastName);
+        employee.setEmailId(emailId);
+        employee.setAge(age);
+        employee.setGender(Gender.MALE);
+        employee.setAddress(address);
+        employee.setQualification(qualification);
+        employee.setDepartment(department);
+
+        when(employeeDAO.findById(1)).thenReturn(Optional.of(employee));
+
         mockMvc.perform(MockMvcRequestBuilders.delete("/employees/1"))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("false"));
+                .andExpect(status().isOk())
+                .andExpect(content().string("true"));
     }
 
     @Test
-    @DisplayName("Test inactivate and employee")
+    @DisplayName("Test inactivate an employee")
     public void testInactivateAnEmployee() throws Exception {
 
-        employee = new Employee();
-        employee.setFirstName("MockFirstName");
-        employee.setLastName("MockLastName");
-        employee.setEmailId("mockEmail@mockdomain.com");
-        employee.setAge(25);
+        Employee employee = new Employee();
+        employee.setFirstName(firstName);
+        employee.setLastName(lastName);
+        employee.setEmailId(emailId);
+        employee.setAge(age);
         employee.setGender(Gender.MALE);
+        employee.setStatus(EmpStatus.DISCONTINUED);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/employees")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(employee)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$").doesNotExist());
+        when(employeeDAO.findById(1)).thenReturn(Optional.of(employee));
 
-        Optional<Employee> emp = Optional.ofNullable(employeeDAO.findByEmailId("mockEmail@mockdomain.com"));
-        assertTrue(emp.isPresent());
+        when(employeeDAO.save(any(Employee.class))).thenReturn(employee);
 
-        Employee createdEmployee = emp.get();
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/employees/"+createdEmployee.getId()+"/inactivate")
+        mockMvc.perform(MockMvcRequestBuilders.put("/employees/1/inactivate")
                         .contentType(APPLICATION_JSON_UTF8)
                         .content("{}"))
                 .andExpect(status().isOk())
@@ -354,15 +358,12 @@ public class EmployeeControllerTest {
     @DisplayName("Test inactivate a non existing employee")
     public void testInactivateANonExistingEmployee() throws Exception {
 
+        when(employeeDAO.findById(0)).thenReturn(Optional.empty());
+
         mockMvc.perform(MockMvcRequestBuilders.put("/employees/0/inactivate")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
                 .andExpect(status().isNotFound());
-    }
-
-    @AfterEach
-    void afterEach() {
-        jdbcTemplate.execute(sqlDeleteEmployee);
     }
 
 }

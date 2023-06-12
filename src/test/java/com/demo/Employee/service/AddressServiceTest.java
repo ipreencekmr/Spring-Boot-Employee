@@ -52,7 +52,6 @@ public class AddressServiceTest {
     @Value("${mock.address.country}")
     private String country;
 
-
     @Value("${mock.address.updated.zip.code}")
     private Integer updatedZipCode;
 
