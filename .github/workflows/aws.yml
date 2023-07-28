@@ -33,15 +33,11 @@ on:
 env:
   AWS_REGION: us-east-1                   # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY: employee-repo           # set this to your Amazon ECR repository name
-  ECS_SERVICE: APP_SERVICE                 # set this to your Amazon ECS service name
-  ECS_CLUSTER: EMP_CLUSTER                 # set this to your Amazon ECS cluster name
+  ECS_SERVICE: APP_SERVICE                # set this to your Amazon ECS service name
+  ECS_CLUSTER: EMP_CLUSTER                # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: EMP_TD # set this to the path to your Amazon ECS task definition # file, e.g. .aws/task-definition.json
-  CONTAINER_NAME: spring-app           # set this to the name of the container in the
-
-  MYSQL_SERVICE: MYSQL_SERVICE
-  MYSQL_TASK_DEFINITION: MYSQL_TD
-  MYSQL_CONTAINER_NAME: mysqldb
-                                               # containerDefinitions section of your task definition
+  CONTAINER_NAME: spring-app              # set this to the name of the container in the
+                                          # containerDefinitions section of your task definition
 
 permissions:
   contents: read
@@ -66,22 +62,6 @@ jobs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
-
-    - name: Fill in the new MySQL image ID in the Amazon ECS task definition
-      id: mysql-task-def
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      with:
-        task-definition: ${{ env.MYSQL_TASK_DEFINITION }}
-        container-name: ${{ env.MYSQL_CONTAINER_NAME }}
-        image: ${{ steps.build-image.outputs.image }}
-
-    - name: Deploy Amazon ECS MySQL task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      with:
-        task-definition: ${{ steps.mysql-task-def.outputs.task-definition }}
-        service: ${{ env.MYSQL_SERVICE }}
-        cluster: ${{ env.ECS_CLUSTER }}
-        wait-for-service-stability: true
 
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
