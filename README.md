@@ -8,7 +8,13 @@
 
 ### Description
 
-Need to run MySQL Server Explicitly and Change Properties
+Configure Following Environment Variables 
+
+- `MYSQL_DATABASE`
+- `MYSQL_HOST`
+- `MYSQL_PASSWORD`
+- `MYSQL_PORT`
+- `MYSQL_USER`
 
 `mvn spring-boot:run`
 
