@@ -69,50 +69,54 @@ Runs the application along with MySQL Server
 - AWS ECS (Application Deployment)
 - Github Actions (CICD)
 
+
 ## Available Services 
 
-### CREATE SERVICES
-
-- Create Qualification
+1. Create Qualification
 
 ``` 
 URL: http://localhost:8080/qualifications
 METHOD: POST
-BODY: 
+BODY:
+
 {
     "value":"MCA"
 }
 
 RESPONSE:
+
 {
     "id": 1,
     "value": "MCA"
 }
 ```
 
-- Create Department
+2. Create Department
 
 ``` 
 URL: http://localhost:8080/departments
 METHOD: POST
-BODY: 
+BODY:
+
 {
     "value":"Quality Analyst"
 }
 
 RESPONSE:
+
 {
     "id": 1,
     "value": "Quality Analyst"
 }
 ```
 
-- Create Employee
+3. Create Employee
 
 ``` 
 URL: http://localhost:8080/employees
 METHOD: POST
-BODY: 
+BODY:
+
 {
     "firstName":"Prince",
     "lastName":"Sharma",
@@ -145,9 +149,7 @@ Status 201 Created
 
 ```
 
-### GET SERVICES
-
-- Get Qualifications
+4. Get Qualifications
 ```
 URL: http://localhost:8080/qualifications
 METHOD: GET
@@ -162,7 +164,7 @@ RESPONSE:
 
 ```
 
-- Get Qualification By ID
+5. Get Qualification By ID
 
 ```
 URL: http://localhost:8080/qualifications/1
@@ -175,7 +177,7 @@ RESPONSE:
 }
 ```
 
-- Get Departments
+6. Get Departments
 
 ``` 
 URL: http://localhost:8080/departments
@@ -190,7 +192,7 @@ RESPONSE:
 ]
 ```
 
-- Get Department By ID
+7. Get Department By ID
 
 ``` 
 URL: http://localhost:8080/departments/1
@@ -203,7 +205,7 @@ RESPONSE:
 }
 ```
 
-- Get Employees 
+8. Get Employees 
 
 ``` 
 URL: http://localhost:8080/employees
@@ -243,7 +245,7 @@ RESPONSE:
 
 ```
 
-- Get Employee By Id
+9. Get Employee By ID
 
 ``` 
 URL: http://localhost:8080/employees/1
@@ -275,47 +277,50 @@ RESPONSE:
 
 ```
 
-### UPDATE SERVICES
-
-- Update Qualification
+10. Update Qualification
 ``` 
 URL: http://localhost:8080/qualifications/1
 METHOD: PUT
-BODY: 
+BODY:
+
 {
     "value":"M.C.A."
 }
 
 RESPONSE:
+
 {
     "id": 1,
     "value": "M.C.A."
 }
 ```
 
-- Update Department
+11. Update Department
 
 ``` 
 URL: http://localhost:8080/departments/1
 METHOD: PUT
 BODY:
+
 {
     "value":"Quality Assurance Engineer"
 }
 
 RESPONSE:
+
 {
     "id": 1,
     "value": "Quality Assurance Engineer"
 }
 ```
 
-- Update Employee
+12. Update an Employee
 
 ``` 
 URL: http://localhost:8080/employees
-METHOD: POST
-BODY: 
+METHOD: PUT
+BODY:
+
 {
     "firstName":"Prince",
     "lastName":"Sharma",
