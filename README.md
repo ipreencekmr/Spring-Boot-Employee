@@ -56,6 +56,10 @@ Runs the application along with MySQL Server
 
 `docker-compose down`
 
+### Java CI Workflow
+
+<img width="1468" alt="JavaCI-Success" src="https://github.com/ipreencekmr/Spring-Boot-Employee/assets/3636918/7b3c6235-4864-4765-a1bc-495076838191">
+
 ## Tech Stack Used
 
 - Maven
