@@ -1,6 +1,7 @@
 package com.demo.Employee.controller;
 
 import com.demo.Employee.enums.EmpStatus;
+import com.demo.Employee.model.Department;
 import com.demo.Employee.model.Employee;
 import com.demo.Employee.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,18 @@ public class EmployeeController {
     public ResponseEntity<List<Employee>> getEmployees() {
         List<Employee> employeeList = employeeService.getEmployees();
         return new ResponseEntity<>(employeeList, HttpStatus.OK);
+    }
+
+    @GetMapping("/employees/{empId}")
+    public ResponseEntity<Employee> getEmployeeInfo(@PathVariable String empId) {
+        Integer employeeId = Integer.parseInt(empId);
+        Employee employee = employeeService.getEmployeeInfo(employeeId);
+
+        if (employee == null) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(employee, HttpStatus.OK);
     }
 
     @PutMapping("/employees/{empId}")

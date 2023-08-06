@@ -243,6 +243,38 @@ RESPONSE:
 
 ```
 
+- Get Employee By Id
+
+``` 
+URL: http://localhost:8080/employees/1
+METHOD: GET
+RESPONSE:
+
+{
+    "id": 1,
+    "firstName": "Prince",
+    "lastName": "Sharma",
+    "emailId": "ipreencekmr@outlook.com",
+    "age": 31,
+    "gender": "MALE",
+    "status": "ACTIVE",
+    "department": null,
+    "address": {
+        "id": 2,
+        "zipCode": 122004,
+        "addressLine1": "Tower 9",
+        "addressLine2": "CPR",
+        "aptSuite": "705",
+        "society": "AVL36",
+        "city": "Gurgaon",
+        "state": "Haryana",
+        "country": "India"
+    },
+    "qualification": null
+}
+
+```
+
 ### UPDATE SERVICES
 
 - Update Qualification
