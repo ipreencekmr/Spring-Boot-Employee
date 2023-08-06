@@ -55,6 +55,13 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+					<environmentVariables>
+						<MYSQL_HOST>db.learn-coding.xyz</MYSQL_HOST>
+						<MYSQL_PORT>3306</MYSQL_PORT>
+						<MYSQL_DATABASE>employee</MYSQL_DATABASE>
+						<MYSQL_USER>root</MYSQL_USER>
+						<MYSQL_PASSWORD>developer</MYSQL_PASSWORD>
+					</environmentVariables>
 				</configuration>
 			</plugin>
 
