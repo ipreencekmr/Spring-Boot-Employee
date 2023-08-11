@@ -58,7 +58,7 @@ public class EmployeeService {
         }
 
         Address foundAddr = address != null && address.getId() != null ? addressService.getAddressById(address.getId()) : null;
-        if (address != null && foundAddr == null ){
+        if (address != null && foundAddr == null){
             foundAddr = addressService.createAddress(address);
         }
 
@@ -110,8 +110,12 @@ public class EmployeeService {
         }
 
         Address foundAddr = address != null && address.getId() != null ? addressService.getAddressById(address.getId()) : null;
-        if (address != null && foundAddr == null ){
-            foundAddr = addressService.createAddress(address);
+        if (address != null){
+            if(foundAddr == null) {
+                foundAddr = addressService.createAddress(address);
+            }else {
+                foundAddr = addressService.updateAddress(address.getId(), address);
+            }
         }
 
         newEmp.setQualification(foundQlf);
